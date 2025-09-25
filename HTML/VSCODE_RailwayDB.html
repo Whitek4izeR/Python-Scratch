@@ -1,0 +1,172 @@
+1. Create Codespace
+Github > Code > Create  a codespace on main
+
+2. Install the virtual env. / dependencies / libraries
+python --version
+python -m venv venv_sample //* Create remote remote development environment
+
+source venv_sample/bin/activate //* Active the remote  virtual env.
+
+3. Run this command:
+pip install flask mysql-connector-python werkzeug
+
+or 
+
+pip install -r requirements.txt [if you already have the requirements.txt created]
+
+
+✅
+4. Createa Database:
+Go to https://railway.com/ and create a database
+
+Once Deployment Successful → Find the below:
+
+host:  - Settings - Under Public Networking
+port: - Variables
+user - Variables
+password - Variables
+database: - Variables
+
+5. Create a file [db.py] and fill the the below:
+
+Ex:
+
+import mysql.connector
+
+def get_connection():
+    return mysql.connector.connect(
+        host="crossover.proxy.rlwy.net",
+        port=44374,                   
+        user="root",        
+        password="GZcaMrNzVXLjCASRjuvHUTjWgzkorhUI",  
+        database="railway"                
+    )
+
+6. Create a file [app.py]
+
+from flask import Flask, jsonify
+from db import get_connection   # ✅ clean import
+
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+    try:
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # ✅ avoid reserved keyword issue
+        cursor.execute("SELECT NOW() AS `current_time`;")
+        result = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "status": "success",
+            "db_time": result["current_time"]
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        })
+
+if __name__ == "__main__":
+    print("🚀 Starting Flask app on port 5000...")
+    app.run(debug=True, host="0.0.0.0", port=5000)
+
+7. Run in Terminal
+python app.py
+
+8. Go to PORT next to Terminal → Look for port 5000 → Click the globe icon
+This should be the result:
+
+{
+  "db_time": "Thu, 25 Sep 2025 18:19:09 GMT",
+  "status": "success"
+}
+
+9. Celebrate → Database[Railway] is now connected to Python
+
+
+
+
+
+
+
+
+# Scratch 
+4. Go to infinityfree.com [Create account]
+https://www.youtube.com/watch?v=mOEqtc9Bg4c
+
+After creattion go to Control Panel > Under Files select Online File Manager
+Note: if it ask for credentials, just provide and if it ask for Inventory Directory just put "/htdocs"
+    If it didn't work just refresh the Page.
+
+5. Create database
+- Go to MySQL Databases > Create New Database
+- After creation look for your created database under Current Databases 
+> under PHPAdmin click Admin button or on the vistapnel under Databases 
+> select phpMyAdmin 
+
+
+6. Once you create your database go back to VS CODE Web
+a. Install Python MySQL Client- In your virtual environment, install:
+pip install mysql-connector-python
+
+7. Create a file db.py and enter the below:
+
+import mysql.connector
+
+def get_connection():
+    return mysql.connector.connect(
+        host="sqlXXX.infinityfree.com",   # your InfinityFree host
+        user="epiz_XXXXXXXX",             # your db username
+        password="YOUR_PASSWORD",         # your db password
+        database="epiz_XXXXXXXX_dbname"   # your db name
+    )
+
+8. Create a file app.py
+
+from flask import Flask, jsonify
+from db import get_connection   # import the db connection function
+
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT NOW() AS current_time;")
+    result = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    return jsonify(result)
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0")
+
+
+9. Run in Terminal
+
+python app.py
+
+You should see something like this:
+ * Running on http://127.0.0.1:5000
+
+
+# Important Notes for InfinityFree
+InfinityFree does not allow remote MySQL connections (from your PC directly).
+- You can only connect if your Flask app is hosted on their server.
+- If you run Flask in VS Code locally, the connection will be blocked.
+
+👉 Workaround:
+
+- Use a local database (MySQL or SQLite) during development.
+- When deploying to InfinityFree, update db.py with their connection details.
+
+########################
